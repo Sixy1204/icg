@@ -407,10 +407,12 @@ and in the fragment shader, compute the normal using the dFdx() and dFdy() funct
     function fetch(idx) {
         return parseFloat(document.getElementById(idx).value);
     }
+    
     var teapotAngle = [180, 180, 180];
-    var translate = [[-15, 2, -40], [1, 1, 1], [18, 4, -40]];   
+    var translate = [[-15, 2, -40], [1, 1, 1], [23, 4, -40]];   
     var rotate = [[0,1,0],[0,1,0],[0,1,0]];
-    var scale = [[1,1,1],[10,10,10],[7,7,7]]
+    var scale = [[0.6,0.6,0.6],[10,10,10],[7,7,7]]
+    
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -428,7 +430,7 @@ and in the fragment shader, compute the normal using the dFdx() and dFdy() funct
                 mat4.rotate(mvMatrix, degToRad(fetch("xRotate")), [1, 0, 0]);
                 mat4.rotate(mvMatrix, degToRad(fetch("zRotate")), [0, 0, 1]);
                 mat4.scale(mvMatrix, scale[i]);
-                mat4.scale(mvMatrix, [fetch("Scale"),fetch("Scale"),fetch("Scale")]);
+                
                 
             }
             if(i==1){
@@ -440,8 +442,12 @@ and in the fragment shader, compute the normal using the dFdx() and dFdy() funct
             
             if(i==2){
                 mat4.rotate(mvMatrix, degToRad(teapotAngle[i]), rotate[i]);
-                mat4.scale(mvMatrix, scale[i]);
+                mat4.scale(mvMatrix, [fetch("Scale"),fetch("Scale"),fetch("Scale")]);
                 mat4.rotate(mvMatrix, degToRad(270), [0.25, 0, 0]);
+                mat4.multiply(mvMatrix, [1, 0, 0, 0, 
+									 0, 1, 0, 0, 
+									 fetch("xShear")/10, fetch("yShear")/10, 1, 0,
+									 0, 0, 0, 1]);
             }
 			
             gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexPositionBuffer_list[i]);
@@ -541,7 +547,7 @@ table, th, td {
 	text-align: center;
 	border: none;
 	padding: 0px;
-    table-layout: auto;	
+    table-layout: fixed;	
 	background-color: rgba(47/255,79/255,79/255, 0);
 }
 input{
@@ -564,21 +570,21 @@ input{
                 </table>
             </div>
         
-        <canvas id="ICG-canvas" style="border: none;" width="1280" height="810"></canvas>
+        <canvas id="ICG-canvas" style="border: none;" width="1280" height="610"></canvas>
         
-        <div style="position: absolute; top:550; left:125;">
+        <div style="position: absolute; top:70%; left:10%;">
 				<table align="center" cellspacing="0" cellpadding="0">
 						<tr>
 							<td>
 								<div>
 									<ul>
-										<li><div class="selector"> xRotate:&nbsp<input id="xRotate" value="23.0"></div>
+										<li><div class="selector"> xRotate:&nbsp;<input id="xRotate" value="23.0"></div>
                                         </li>
                                         <br>
-                                        <li><div class="selector"> yRotate:&nbsp<input id="yRotate" value="180.0"></div>
+                                        <li><div class="selector"> yRotate:&nbsp;<input id="yRotate" value="180.0"></div>
                                         </li>
                                         <br>
-                                        <li><div class="selector"> zRotate:&nbsp<input id="zRotate" value="-40.0"></div>
+                                        <li><div class="selector"> zRotate:&nbsp;<input id="zRotate" value="-40.0"></div>
                                         </li>
                                         <br>
 									</ul>
@@ -588,13 +594,13 @@ input{
                             <td>
 								<div>
 									<ul>
-										<li><div class="selector"> xTranslate:&nbsp<input id="xTrans" value="0.0"></div>
+										<li><div class="selector"> xTranslate:&nbsp;<input id="xTrans" value="3.0"></div>
                                         </li>
                                         <br>
-                                        <li><div class="selector"> yTranslate:&nbsp<input id="yTrans" value="7.0"></div>
+                                        <li><div class="selector"> yTranslate:&nbsp;<input id="yTrans" value="7.0"></div>
                                         </li>
                                         <br>
-                                        <li><div class="selector"> zTranslate:&nbsp<input id="zTrans" value="-40.0"></div>
+                                        <li><div class="selector"> zTranslate:&nbsp;<input id="zTrans" value="-40.0"></div>
                                         </li>
                                         <br>
 									</ul>
@@ -603,13 +609,13 @@ input{
                             <td>
 								<div>
 									<ul>
-										<li><div class="selector"> xShear:&nbsp<input id="xShear" value="180.0"></div>
+										<li><div class="selector"> xShear:&nbsp;<input id="xShear" value="5.0"></div>
                                         </li>
                                         <br>
-                                        <li><div class="selector"> yShear:&nbsp<input id="yShear" value="180.0"></div>
+                                        <li><div class="selector"> yShear:&nbsp;<input id="yShear" value="3.0"></div>
                                         </li>
                                         <br>
-                                        <li><div class="selector"> zShear:&nbsp<input id="zShear" value="180.0"></div>
+                                        <li><div class="selector"> Scale:&nbsp;&nbsp;&nbsp;<input id="Scale" value="7.0"></div>
                                         </li>
                                         <br>
 									</ul>
@@ -617,31 +623,22 @@ input{
 							</td>
 						</tr>
 						
-				        <tr>
-                            <td>
-				                <div>
-				                    <ul>
-				                        <li><div class="selector"> Scale:&nbsp&nbsp&nbsp&nbsp&nbsp<input id="Scale" value="0.6"></div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
+				        
 						<tr>
 							<td>
-								<div class="selector">&nbsp</div>
+								<div class="selector">&nbsp;</div>
 								<div class="selectWidth">
 									
 								</div>
 							</td>
 							<td>
-								<div class="selector">&nbsp</div>
+								<div class="selector">&nbsp;</div>
 								<div class="selectWidth">
 									
 								</div>
 							</td>
 							<td>
-								<div class="selector">&nbsp</div>
+								<div class="selector">&nbsp;</div>
 								<div class="selectWidth">
 									
 								</div>
